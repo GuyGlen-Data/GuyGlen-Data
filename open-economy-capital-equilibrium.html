@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מבוא לכלכלה ב' - תרגיל 5 - שאלה 2 סעיף ג'</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .chart-container {
+            position: relative;
+            margin: 40px auto;
+            height: 500px;
+            width: 100%;
+        }
+        .info-box {
+            background-color: #fcf3cf;
+            border-right: 5px solid #f39c12;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>שאלה 2: שיווי משקל בשוק ההון במשק פתוח</h1>
+    <h2>גרף שוק ההון ומעבר ממצב a למצב b</h2>
+
+    <div class="chart-container">
+        <canvas id="openEconomyChart"></canvas>
+    </div>
+
+    <div class="info-box">
+        <h3>דגשים לשרטוט:</h3>
+        <ul>
+            <li><strong>שער הריבית ($r^*$)</strong> קבוע לחלוטין ברמה של 5% (קו אופקי כחול).</li>
+            <li><strong>במצב מוצא (a):</strong> החיסכון הלאומי $S_a=500$ שווה בדיוק להשקעה $I_a=500$. נקודת שיווי המשקל היא <strong>E_a</strong> והעודף בחשבון הפיננסי הוא $KAS_a = 0$.</li>
+            <li><strong>במצב החדש (b):</strong> עקומת החיסכון זזה שמאלה ל-$S_b(r)$. בריבית הקבועה של 5%, החיסכון המקומי יורד ל-320 בעוד ההשקעה יציבה על 500. נקודת שיווי המשקל החדשה מול העולם היא <strong>E_b</strong>.</li>
+            <li><strong>הפער (KAS_b):</strong> המרחק האופקי בין החיסכון להשקעה בריבית 5% מייצג את יבוא ההון מחו"ל: $500 - 320 = 180$.</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    // בניית עקומת הביקוש להשקעות I(r) = 25/r
+    const investmentPoints = [];
+    for (let r = 2.5; r <= 10; r += 0.5) {
+        investmentPoints.push({x: 25 / (r / 100), y: r});
+    }
+
+    // בניית עקומות החיסכון המקומי: Sa = 10,000r, Sb = 6,400r
+    const savingsPointsA = [];
+    const savingsPointsB = [];
+    for (let r = 0; r <= 10; r += 1) {
+        savingsPointsA.push({x: 10000 * (r / 100), y: r});
+        savingsPointsB.push({x: 6400 * (r / 100), y: r});
+    }
+
+    // קו הריבית העולמית הקבועה r* = 5%
+    const worldInterestRate = [{x: 0, y: 5}, {x: 800, y: 5}];
+
+    const ctx = document.getElementById('openEconomyChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                {
+                    label: 'ביקוש להשקעה I(r)',
+                    data: investmentPoints,
+                    showLine: true,
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'transparent',
+                    borderWidth: 3,
+                    pointRadius: 0,
+                    tension: 0.4
+                },
+                {
+                    label: 'חיסכון מקומי מקורי Sa(r)',
+                    data: savingsPointsA,
+                    showLine: true,
+                    borderColor: '#2ecc71',
+                    backgroundColor: 'transparent',
+                    borderWidth: 3,
+                    pointRadius: 0
+                },
+                {
+                    label: 'חיסכון מקומי חדש Sb(r)',
+                    data: savingsPointsB,
+                    showLine: true,
+                    borderColor: '#27ae60',
+                    backgroundColor: 'transparent',
+                    borderWidth: 3,
+                    borderDash: [6, 6],
+                    pointRadius: 0
+                },
+                {
+                    label: 'שער הריבית העולמית *r = 5%',
+                    data: worldInterestRate,
+                    showLine: true,
+                    borderColor: '#3498db',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2.5,
+                    pointRadius: 0
+                },
+                {
+                    label: 'שיווי משקל מקורי Ea (S=I)',
+                    data: [{x: 500, y: 5}],
+                    borderColor: '#2c3e50',
+                    backgroundColor: '#34495e',
+                    pointRadius: 7
+                },
+                {
+                    label: 'שיווי משקל חדש Eb (בריבית עולמית)',
+                    data: [{x: 320, y: 5}],
+                    borderColor: '#2c3e50',
+                    backgroundColor: '#e67e22',
+                    pointRadius: 7,
+                    pointStyle: 'rectRot'
+                },
+                // קו עזר אנכי להורדה לציר ה-X עבור החיסכון החדש (320)
+                {
+                    data: [{x: 320, y: 0}, {x: 320, y: 5}],
+                    showLine: true,
+                    borderColor: 'rgba(230, 126, 34, 0.5)',
+                    borderWidth: 1.5,
+                    borderDash: [4, 4],
+                    pointRadius: 0,
+                    label: false
+                },
+                // קו עזר אנכי להורדה לציר ה-X עבור ההשקעה והחיסכון המקורי (500)
+                {
+                    data: [{x: 500, y: 0}, {x: 500, y: 5}],
+                    showLine: true,
+                    borderColor: 'rgba(52, 152, 219, 0.5)',
+                    borderWidth: 1.5,
+                    borderDash: [4, 4],
+                    pointRadius: 0,
+                    label: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    title: {
+                        display: true,
+                        text: 'כמויות חיסכון והשקעה (S, I)',
+                        font: { size: 14, weight: 'bold' }
+                    },
+                    min: 0,
+                    max: 800,
+                    ticks: { stepSize: 100 }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'שער הריבית הריאלית (r ב-%)',
+                        font: { size: 14, weight: 'bold' }
+                    },
+                    min: 0,
+                    max: 10,
+                    ticks: {
+                        stepSize: 1,
+                        callback: function(value) { return value + '%'; }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        filter: function(item) { return item.text !== false; },
+                        font: { size: 11, weight: 'bold' }
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
